@@ -19,7 +19,10 @@ splitable(LST, L1, L2) :- LST=[], L1=[], L2=[], fail.
 union(S1, S2, S3) :- S1=[], S2=[], S3=[], fail.
 
 % Succeeds if LST is a list of integers in ascending order.
-issorted(LST) :- LST=[], fail.
+% issorted(LST) :- LST=[], fail.
+issorted([]).
+issorted([_]).
+issorted([H | [N | T]]) :- H =< N, issorted([N | T]).
 
 % Given any combination of input parameters, finds
 % consistent variable instatiations.
