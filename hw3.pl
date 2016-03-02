@@ -24,8 +24,12 @@ zip([H1 | T1], [H2 | T2], ZIP) :- zip(T1, T2, Y), append([[H1, H2]], Y, ZIP).
 
 % Succeeds if the list of integers can be cleved into two
 % sections that both sum to the same value.
-splitable(LST, L1, L2) :- LST=[], L1=[], L2=[], fail.
+splitable([], [], []).
+splitable(LST, L1, L2) :- append(L1, L2, LST), sum(L1, X), sum(L2, Y), X = Y.
 % :- sum(left half) = sum(right half)
+
+sum([], 0).
+sum([H | T], SUM) :- sum(T, X), SUM is X + H.
 
 % S1, S2, and S3 are flat lists representing a set of integers. 
 % S3 is the union of S1 and S2.
