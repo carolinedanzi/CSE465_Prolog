@@ -6,14 +6,20 @@
 
 % The real root(s) of Ax^2+Bx+C=0 are returned in the listen
 % ROOTS
-neg_b_over_2a(A, B, Result) :- X is 0 - B, Y is 2 * A, Result is X / Y.
-sqrt_over_2a(A, B, C, Result) :- X is B * B, Y is 4 * A * C, Z is X - Y, sqrt(Z, W), T is 2 * A, Result is W / T.
+% If just kx^2, there is only one root and it is zero.
+quadratic(_, 0, 0, [0]) :- !.
+% If taking the square root of a negative number, sqrt_over_2a will fail so we should just return the empty list.
+quadratic(A, B, C, ROOTS) :- \+ sqrt_over_2a(A, B, C, _), ROOTS = []. 
+% Otherwise, we should compute -b/2a and sqrt(b^2 - 4ac)/2a, then find the two roots 
 quadratic(A, B, C, ROOTS) :- neg_b_over_2a(A, B, X), sqrt_over_2a(A, B, C, Y), P is X + Y, N is X - Y, ROOTS = [P, N].
+neg_b_over_2a(A, B, Result) :- X is 0 - B, Y is 2 * A, Result is X / Y.
+sqrt_over_2a(A, B, C, Result) :- X is B * B, Y is 4 * A * C, Z is X - Y, Z >= 0, sqrt(Z, W), T is 2 * A, Result is W / T.
+
 
 % The minimum and maximum values of the integer list, LST,
 % are returned in the second parameter.
 minmax([], []).
-minmax([H], [H, H]).
+minmax([H], [H, H]) :- !.
 minmax(LST, [MIN, MAX]) :- min(LST, MIN), max(LST, MAX).
 
 min([N], N).
@@ -41,6 +47,7 @@ sum([H | T], SUM) :- sum(T, X), SUM is X + H.
 % S1, S2, and S3 are flat lists representing a set of integers. 
 % S3 is the union of S1 and S2.
 union([], [], []).
+union([H1|T1], [H2|T2], S) :- addNoDups(H1, S, X), addNoDups(H2, X, S), union(T1, T2, S).
 % union(S1, S2, S3) :- append(S1, S2, X), removeDups(X, S3).
 % union(L1, L2, S) :- u2(L1, S), u2(L2, S).
 
