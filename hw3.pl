@@ -13,7 +13,7 @@ quadratic(A, B, C, ROOTS) :- \+ sqrt_over_2a(A, B, C, _), ROOTS = [].
 % Otherwise, we should compute -b/2a and sqrt(b^2 - 4ac)/2a, then find the two roots 
 quadratic(A, B, C, ROOTS) :- neg_b_over_2a(A, B, X), sqrt_over_2a(A, B, C, Y), P is X + Y, N is X - Y, ROOTS = [P, N].
 neg_b_over_2a(A, B, Result) :- X is 0 - B, Y is 2 * A, Result is X / Y.
-sqrt_over_2a(A, B, C, Result) :- X is B * B, Y is 4 * A * C, Z is X - Y, Z >= 0, sqrt(Z, W), T is 2 * A, Result is W / T.
+sqrt_over_2a(A, B, C, Result) :- X is B * B, Y is 4 * A * C, Z is X - Y, Z >= 0, W is sqrt(Z), T is 2 * A, Result is W / T.
 
 
 % The minimum and maximum values of the integer list, LST,
@@ -47,24 +47,15 @@ sum([H | T], SUM) :- sum(T, X), SUM is X + H.
 % S1, S2, and S3 are flat lists representing a set of integers. 
 % S3 is the union of S1 and S2.
 union([], [], []).
-union([H1|T1], [H2|T2], S) :- addNoDups(H1, S, X), addNoDups(H2, X, S), union(T1, T2, S).
-% union(S1, S2, S3) :- append(S1, S2, X), removeDups(X, S3).
-% union(L1, L2, S) :- u2(L1, S), u2(L2, S).
+union([], L, L).
+% if S2 already has H, do not add it to S3
+union([H|T], S2, S3) :- contains(S2, H), union(T, S2, S3).
+% if S2 does not have H, add it to S3
+union([H|T], S2, [H|S3]) :- \+ contains(S2, H), union(T, S2, S3).
 
 % add an element X to Result only if it does not appear in LST
 addNoDups(X, LST, Result) :- contains(LST, X), Result = LST.
 addNoDups(X, LST, Result) :- \+ contains(LST, X), Result = [X | LST].
-
-addSet([], _).
-addSet([H|T], S2) :- addNoDups(H, S2, X), addSet(T, X).
-
-% removeDups([], _) :- !.
-% removeDups([H|T], New) :- contains(T, H), removeDups(T, New).
-% removeDups([H|T], New) :- \+ contains(T, H), removeDups(T, [H|New]).
-
-% add H into R only if it does not appear in R already.
-% u2([], []).
-% u2([H|T], R) :- u2(T, LST), \+ contains(LST, H), R = [H|LST].
 
 % based on contains0 class code
 contains([H|_], X) :- H = X, !.
